@@ -1,13 +1,13 @@
 {
   "domain": "unifi_connect",
   "name": "Unifi Connect",
-  "version": "1.0.2",
-  "documentation": "https://github.com/iamslan/ha-unifi-connect",
+  "version": "1.4.0",
+  "documentation": "https://github.com/danielsza/ha-unifi-connect",
   "integration_type": "hub",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@iamslan"],
+  "codeowners": ["@iamslan", "@danielsza"],
   "config_flow": true,
-  "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/iamslan/ha-unifi-connect/issues"
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/danielsza/ha-unifi-connect/issues"
 }
