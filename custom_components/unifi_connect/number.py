@@ -5,8 +5,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DEVICE_PLATFORM_SE21, ACTION_BRIGHTNESS, ACTION_VOLUME
-from .entity import UnifiConnectEntity
+from .const import DOMAIN, SUPPORTED_PLATFORMS, ACTION_BRIGHTNESS, ACTION_VOLUME
+from .entity import UnifiConnectEntity, supports_action
 from .hub import UnifiConnectHub
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,12 +43,12 @@ async def async_setup_entry(
     entities: list[NumberEntity] = []
 
     for device in hub.coordinator.data or []:
-        if device.get("type", {}).get("platform") != DEVICE_PLATFORM_SE21:
+        if device.get("type", {}).get("platform") not in SUPPORTED_PLATFORMS:
             continue
 
         features = device.get("featureFlags", {})
         for config in NUMBER_ENTITIES:
-            if config["feature_key"] in features:
+            if config["feature_key"] in features and supports_action(device, config["action_name"]):
                 entities.append(DisplayNumberSlider(hub, device, config))
 
     async_add_entities(entities)

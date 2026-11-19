@@ -5,8 +5,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DEVICE_PLATFORM_SE21, ACTION_MODE_SWITCH, ACTION_LAUNCH_APP
-from .entity import UnifiConnectEntity
+from .const import DOMAIN, SUPPORTED_PLATFORMS, ACTION_MODE_SWITCH, ACTION_LAUNCH_APP
+from .entity import UnifiConnectEntity, supports_action
 from .hub import UnifiConnectHub
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,14 +20,14 @@ async def async_setup_entry(
     entities: list[SelectEntity] = []
 
     for device in hub.coordinator.data or []:
-        if device.get("type", {}).get("platform") != DEVICE_PLATFORM_SE21:
+        if device.get("type", {}).get("platform") not in SUPPORTED_PLATFORMS:
             continue
 
         features = device.get("featureFlags", {})
         if "mode" in features:
             entities.append(DisplayModeSelect(hub, device))
 
-        if "appList" in device.get("shadow", {}):
+        if "appList" in device.get("shadow", {}) and supports_action(device, "launch_app"):
             entities.append(AppSelect(hub, device))
 
     async_add_entities(entities)

@@ -8,7 +8,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     DOMAIN,
-    DEVICE_PLATFORM_SE21,
+    SUPPORTED_PLATFORMS,
     ACTION_DISPLAY_ON,
     ACTION_DISPLAY_OFF,
     ACTION_ENABLE_AUTO_ROTATE,
@@ -20,7 +20,7 @@ from .const import (
     ACTION_ENABLE_AUTO_SLEEP,
     ACTION_DISABLE_AUTO_SLEEP,
 )
-from .entity import UnifiConnectEntity
+from .entity import UnifiConnectEntity, supports_action
 from .hub import UnifiConnectHub
 
 _LOGGER = logging.getLogger(__name__)
@@ -73,14 +73,16 @@ async def async_setup_entry(
     entities: list[SwitchEntity] = []
 
     for device in hub.coordinator.data or []:
-        if device.get("type", {}).get("platform") != DEVICE_PLATFORM_SE21:
+        if device.get("type", {}).get("platform") not in SUPPORTED_PLATFORMS:
             continue
 
         entities.append(DisplayPowerSwitch(hub, device))
 
         shadow = device.get("shadow", {})
         for config in TOGGLE_SWITCHES:
-            if config["shadow_key"] in shadow:
+            if config["shadow_key"] in shadow and supports_action(
+                device, config["enable_action_name"], config["disable_action_name"]
+            ):
                 entities.append(ToggleSwitch(hub, device, config))
 
     async_add_entities(entities)

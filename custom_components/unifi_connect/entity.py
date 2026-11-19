@@ -1,7 +1,20 @@
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, DEVICE_PLATFORM_SE21
+
+
+def supports_action(device: dict, *names: str) -> bool:
+    """True if the device can perform all the named actions.
+
+    The SE 21 is always treated as supporting its known actions. Other models are checked against the action list the console
+    publishes for them, so we don't create controls that would only return errors.
+    """
+    t = device.get("type") or {}
+    if t.get("platform") == DEVICE_PLATFORM_SE21:
+        return True
+    have = {a.get("name") for a in t.get("supportedActions") or []}
+    return all(n in have for n in names)
 
 
 class UnifiConnectEntity(CoordinatorEntity):

@@ -6,7 +6,7 @@ from typing import Any
 
 import aiohttp
 
-from .const import DEFAULT_PORT, CONTROLLER_UDMP
+from .const import DEFAULT_PORT, CONTROLLER_UDMP, DEVICE_PLATFORM_SE21
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ class UnifiConnectAPI:
         self._session = session
         self._cookies: aiohttp.CookieJar | None = None
         self._csrf: str | None = None
+        self._devices: dict[str, dict[str, Any]] = {}
 
     async def login(self) -> bool:
         """Login and store CSRF token."""
@@ -60,7 +61,23 @@ class UnifiConnectAPI:
     async def get_devices(self) -> list[dict[str, Any]]:
         """Fetch list of devices. Raises UnifiConnectAPIError on failure."""
         result = await self._request("GET", "api/v2/devices?shadow=true")
-        return result if isinstance(result, list) else []
+        devices = result if isinstance(result, list) else []
+        self._devices = {d["id"]: d for d in devices if "id" in d}
+        return devices
+
+    def resolve_action_id(self, device_id: str, action_name: str, fallback: str) -> str:
+        """Return the console's own id for an action name on this device's model.
+
+        The SE 21 keeps the ids hard-coded in const.py. Other models (e.g. Display Cast Pro) publish their action ids in
+        ``type.supportedActions``, and those differ from the SE 21's, so they are looked up by name.
+        """
+        device = self._devices.get(device_id) or {}
+        if (device.get("type") or {}).get("platform") == DEVICE_PLATFORM_SE21:
+            return fallback
+        for action in (device.get("type") or {}).get("supportedActions") or []:
+            if action.get("name") == action_name and action.get("id"):
+                return action["id"]
+        return fallback
 
     async def perform_action(
         self,
@@ -71,7 +88,10 @@ class UnifiConnectAPI:
     ) -> bool:
         """Perform an action on a device."""
         path = f"api/v2/devices/{device_id}/status"
-        payload: dict[str, Any] = {"id": action_id, "name": action_name}
+        payload: dict[str, Any] = {
+            "id": self.resolve_action_id(device_id, action_name, action_id),
+            "name": action_name,
+        }
         if args:
             payload["args"] = args
 
