@@ -17,6 +17,10 @@ CONTROLLER_OTHER = "Other Unifi Controllers"
 PLATFORMS = [Platform.SWITCH, Platform.SELECT, Platform.NUMBER, Platform.TEXT, Platform.BUTTON]
 
 DEVICE_PLATFORM_SE21 = "UC-Display-SE-21"
+DEVICE_PLATFORM_CAST_PRO = "UC-Cast-Pro"
+# Models whose shadow/action layout is known to match. Entities are still created per-feature (shadow keys / featureFlags), so a
+# model only gets the controls it actually reports.
+SUPPORTED_PLATFORMS = {DEVICE_PLATFORM_SE21, DEVICE_PLATFORM_CAST_PRO}
 
 # Action IDs for the UniFi Connect API
 ACTION_REFRESH_WEBSITE = "416cef71-50b4-4983-91cc-e6d8dcb82505"

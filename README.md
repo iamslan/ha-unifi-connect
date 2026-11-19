@@ -4,7 +4,7 @@
 [![GitHub License](https://img.shields.io/github/license/iamslan/ha-unifi-connect)](LICENSE)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.2.5%2B-blue)
 
-A custom [Home Assistant](https://www.home-assistant.io/) integration for **UniFi Connect** display devices, using the local UniFi Connect API. Currently supports the **UniFi Connect Display SE 21**.
+A custom [Home Assistant](https://www.home-assistant.io/) integration for **UniFi Connect** display devices, using the local UniFi Connect API. Currently supports the **UniFi Connect Display SE 21** and the **Display Cast Pro**.
 
 ## Prerequisites
 
@@ -80,8 +80,9 @@ You must create a **local-only** UniFi OS account:
 | Device | Platform ID |
 |--------|-------------|
 | UniFi Connect Display SE 21 | `UC-Display-SE-21` |
+| UniFi Connect Display Cast Pro | `UC-Cast-Pro` (power, reload page, web URL, mode, volume, auto reload) |
 
-Additional UniFi Connect devices may work but are untested. If you have a different device and it works (or doesn't), please [open an issue](https://github.com/iamslan/ha-unifi-connect/issues).
+Entities are created per device from the actions the console reports for that model, so a model only gets the controls it supports. Other UniFi Connect devices may work but are untested. If you have a different device and it works (or doesn't), please [open an issue](https://github.com/iamslan/ha-unifi-connect/issues).
 
 ## Contributing
 

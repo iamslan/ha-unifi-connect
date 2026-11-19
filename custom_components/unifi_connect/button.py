@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DEVICE_PLATFORM_SE21, ACTION_REFRESH_WEBSITE
+from .const import DOMAIN, SUPPORTED_PLATFORMS, ACTION_REFRESH_WEBSITE
 from .entity import UnifiConnectEntity
 from .hub import UnifiConnectHub
 
@@ -20,7 +20,7 @@ async def async_setup_entry(
     entities: list[ButtonEntity] = []
 
     for device in hub.coordinator.data or []:
-        if device.get("type", {}).get("platform") == DEVICE_PLATFORM_SE21:
+        if device.get("type", {}).get("platform") in SUPPORTED_PLATFORMS:
             entities.append(ReloadWebButton(hub, device))
 
     async_add_entities(entities)
